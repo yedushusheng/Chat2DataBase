@@ -9,6 +9,14 @@ import os
 import sys
 import uvicorn
 
+# 强制 UTF-8 编码，避免 Windows 重定向日志时出现乱码
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
+# 使用国内 HuggingFace 镜像加速模型下载
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Chat2DB-AI 启动脚本")
@@ -28,7 +36,7 @@ def main():
     port = args.port or settings.PORT
     workers = args.workers or settings.WORKERS
 
-    print(f"🚀 Chat2DB-AI 启动中...")
+    print("Chat2DB-AI 启动中...")
     print(f"   环境: {settings.ENV}")
     print(f"   地址: http://{host}:{port}")
     print(f"   文档: http://{host}:{port}/docs")
@@ -40,7 +48,7 @@ def main():
         host=host,
         port=port,
         workers=workers if settings.ENV == "production" else 1,
-        reload=settings.DEBUG,
+        reload=False,
         log_level=settings.LOG_LEVEL.lower(),
     )
 

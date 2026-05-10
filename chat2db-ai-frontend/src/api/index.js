@@ -28,6 +28,10 @@ export default {
       headers: { 'Content-Type': 'application/json' },
       body: payload
     }).then(async (response) => {
+      if (!response.ok) {
+        const text = await response.text().catch(() => '请求失败')
+        throw new Error(text)
+      }
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
       let buffer = ''
@@ -39,22 +43,21 @@ export default {
           break
         }
         buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n\n')
-        buffer = lines.pop() || ''
+        const events = buffer.split('\n\n')
+        buffer = events.pop() || ''
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const chunk = line.slice(6).trim()
-            if (chunk === '[DONE]') {
-              onDone && onDone()
-              return
-            }
-            if (chunk.startsWith('[ERROR]')) {
-              onError && onError(new Error(chunk))
-              return
-            }
-            onMessage && onMessage(chunk)
+        for (const event of events) {
+          const dataLines = event.split('\n').filter(l => l.startsWith('data: '))
+          const chunk = dataLines.map(l => l.slice(6)).join('\n')
+          if (chunk === '[DONE]') {
+            onDone && onDone()
+            return
           }
+          if (chunk.startsWith('[ERROR]')) {
+            onError && onError(new Error(chunk))
+            return
+          }
+          onMessage && onMessage(chunk)
         }
       }
     }).catch((err) => onError && onError(err))

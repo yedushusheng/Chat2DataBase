@@ -69,8 +69,8 @@ function exportMd() {
 <style scoped>
 .message-bubble {
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 12px;
   padding: 0 16px;
 }
 .message-bubble.user {
@@ -107,8 +107,9 @@ function exportMd() {
   border-radius: 4px;
 }
 .content {
-  line-height: 1.7;
+  line-height: 1.55;
   color: #1f2937;
+  white-space: pre-wrap;
 }
 .content :deep(pre) {
   background: #1e1e1e;
@@ -132,15 +133,25 @@ function exportMd() {
   opacity: 1;
 }
 .section {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 .section h4 {
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
   color: #111827;
   font-size: 15px;
 }
+.section :deep(p) {
+  margin: 4px 0;
+}
+.section :deep(ul) {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+.section :deep(li) {
+  margin: 2px 0;
+}
 .sources {
-  margin-top: 10px;
+  margin-top: 6px;
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
@@ -151,6 +162,9 @@ function exportMd() {
   color: #6b7280;
 }
 .suggestion {
-  margin-top: 10px;
+  margin-top: 6px;
+}
+.suggestion :deep(.el-alert) {
+  padding: 6px 10px;
 }
 </style>

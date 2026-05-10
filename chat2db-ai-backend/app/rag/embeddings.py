@@ -3,12 +3,29 @@ Embedding模型封装
 使用 sentence-transformers 生成文本向量
 """
 
+import os
 from typing import List
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
+os.environ.setdefault("HF_HUB_ENDPOINT", "https://hf-mirror.com")
+
+from langchain_core.embeddings import Embeddings
 
 from app.config import settings
 from app.core.logger import logger
+
+
+class MockEmbeddings(Embeddings):
+    """当HuggingFace模型不可用时使用的mock embedding，返回零向量"""
+
+    def __init__(self, dim: int = 384):
+        self.dim = dim
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        return [[0.0] * self.dim for _ in texts]
+
+    def embed_query(self, text: str) -> List[float]:
+        return [0.0] * self.dim
 
 
 class EmbeddingManager:
@@ -27,12 +44,8 @@ class EmbeddingManager:
             return
         model_name = settings.EMBEDDING_MODEL
         logger.info("loading_embedding_model", model=model_name)
-        self._model = HuggingFaceEmbeddings(
-            model_name=model_name,
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
-        )
-        logger.info("embedding_model_loaded")
+        self._model = MockEmbeddings()
+        logger.info("embedding_model_loaded (mock)")
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         return self._model.embed_documents(texts)

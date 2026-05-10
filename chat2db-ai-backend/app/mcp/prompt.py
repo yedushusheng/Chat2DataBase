@@ -92,19 +92,17 @@ class PromptEngine:
         current_content = []
 
         for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-            if re.match(r"^(\d+[\.、]|#+\s|【.+?】|[一二三四五六七八九十]+[、\.])", line):
+            stripped = line.strip()
+            if re.match(r"^(\d+[\.、]|#+\s|【.+?】|[一二三四五六七八九十]+[、\.])", stripped):
                 if current_content:
                     sections.append({
                         "title": current_title,
                         "content": "\n".join(current_content).strip(),
                     })
-                current_title = re.sub(r"^[\d#\.、【】\s]+", "", line)
+                current_title = re.sub(r"^[\d#\.、【】\s]+", "", stripped)
                 current_content = []
             else:
-                current_content.append(line)
+                current_content.append(stripped)
 
         if current_content:
             sections.append({

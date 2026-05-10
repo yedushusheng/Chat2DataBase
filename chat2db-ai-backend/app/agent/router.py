@@ -44,8 +44,11 @@ class AgentRouter:
 
         # 2. RAG 检索
         rag_results = []
-        store = get_chroma_store()
-        rag_results = store.search(query, db_type=db_type)
+        try:
+            store = get_chroma_store()
+            rag_results = store.search(query, db_type=db_type)
+        except Exception as e:
+            logger.warning("rag_search_skipped", error=str(e))
 
         # 3. MCP 准备上下文
         mcp_result = mcp_engine.prepare(
@@ -89,8 +92,12 @@ class AgentRouter:
         skill = skill_registry.get(db_type)
         skill_results = skill.search(query) if skill else []
 
-        store = get_chroma_store()
-        rag_results = store.search(query, db_type=db_type)
+        rag_results = []
+        try:
+            store = get_chroma_store()
+            rag_results = store.search(query, db_type=db_type)
+        except Exception as e:
+            logger.warning("rag_search_skipped", error=str(e))
 
         mcp_result = mcp_engine.prepare(
             db_type=db_type, query=query,

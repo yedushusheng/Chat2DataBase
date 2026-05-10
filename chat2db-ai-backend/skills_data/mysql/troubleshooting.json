@@ -8,7 +8,7 @@
   {
     "id": "mysql-002",
     "title": "MySQL主从复制延迟排查",
-    "content": "**排查步骤**: \n1. 查看延迟: `SHOW SLAVE STATUS\G` 关注 `Seconds_Behind_Master`\n2. 分析延迟原因:\n   - 主库执行了大事务（如批量DELETE/UPDATE）\n   - 从库IO/CPU瓶颈\n   - 从库承担了额外负载（如备份、报表查询）\n   - 主从网络带宽不足或跨机房\n3. 查看从库回放线程: `SHOW PROCESSLIST` 找system user\n4. 查看relay log进度对比master binlog\n**解决方案**: \n- 启用并行复制: `slave_parallel_workers=8`, `slave_parallel_type=LOGICAL_CLOCK`\n- MySQL 8.0使用writeset模式: `transaction_write_set_extraction=XXHASH64`, `binlog_transaction_dependency_tracking=WRITESET`\n- 拆分大事务、升级从库硬件、专线网络",
+    "content": "**排查步骤**: \n1. 查看延迟: `SHOW SLAVE STATUS \\G` 关注 `Seconds_Behind_Master`\n2. 分析延迟原因:\n   - 主库执行了大事务（如批量DELETE/UPDATE）\n   - 从库IO/CPU瓶颈\n   - 从库承担了额外负载（如备份、报表查询）\n   - 主从网络带宽不足或跨机房\n3. 查看从库回放线程: `SHOW PROCESSLIST` 找system user\n4. 查看relay log进度对比master binlog\n**解决方案**: \n- 启用并行复制: `slave_parallel_workers=8`, `slave_parallel_type=LOGICAL_CLOCK`\n- MySQL 8.0使用writeset模式: `transaction_write_set_extraction=XXHASH64`, `binlog_transaction_dependency_tracking=WRITESET`\n- 拆分大事务、升级从库硬件、专线网络",
     "metadata": {"severity": "P1", "tags": ["主从","复制","延迟"], "author": "DBA团队"}
   },
   {

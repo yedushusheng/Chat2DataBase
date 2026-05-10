@@ -46,12 +46,18 @@ async def chat_stream(req: ChatRequest):
                 if chunk == "[DONE]":
                     yield "data: [DONE]\n\n"
                 elif chunk.startswith("[错误]") or chunk.startswith("\n[错误]"):
-                    yield f"data: {chunk}\n\n"
+                    for line in chunk.split("\n"):
+                        yield f"data: {line}\n"
+                    yield "\n"
                 else:
-                    yield f"data: {chunk}\n\n"
+                    for line in chunk.split("\n"):
+                        yield f"data: {line}\n"
+                    yield "\n"
         except Exception as e:
             logger.error("stream_error", error=str(e))
-            yield f"data: [ERROR] {str(e)}\n\n"
+            for line in f"[ERROR] {str(e)}".split("\n"):
+                yield f"data: {line}\n"
+            yield "\n"
             yield "data: [DONE]\n\n"
 
     return StreamingResponse(

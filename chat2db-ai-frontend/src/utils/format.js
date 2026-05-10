@@ -17,7 +17,17 @@ const md = new MarkdownIt({
 })
 
 export function renderMarkdown(text) {
-  return md.render(text || '')
+  const cleaned = (text || '')
+    .split('\n')
+    .reduce((acc, line) => {
+      if (line.trim() === '' && acc.length && acc[acc.length - 1].trim() === '') {
+        return acc
+      }
+      acc.push(line)
+      return acc
+    }, [])
+    .join('\n')
+  return md.render(cleaned)
 }
 
 export function copyToClipboard(text) {

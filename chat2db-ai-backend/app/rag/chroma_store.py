@@ -7,7 +7,7 @@ import hashlib
 from typing import List, Optional
 
 import chromadb
-from langchain.schema import Document
+from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
 
 from app.config import settings
