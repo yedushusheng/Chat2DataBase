@@ -1,2 +1,57 @@
+# --- Environment & Secrets ---
 .env
-.env.production
+.env.*
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+.venv/
+
+# --- IDE & Editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Frontend ---
+node_modules/
+node_modules/.vite/
+chat2db-ai-frontend/node_modules/.vite/
+chat2db-ai-frontend/dist/
+
+# --- Runtime Data ---
+chroma_db/
+uploads/
+conversations.db
+chat_response.json
+backend.log
+
+# --- OS ---
+.DS_Store
+Thumbs.db
