@@ -88,7 +88,7 @@ function exportMd() {
 }
 .content-wrapper {
   max-width: 80%;
-  padding: 12px 16px;
+  padding: 10px 14px;
   display: flex;
   flex-direction: column;
 }
@@ -107,20 +107,21 @@ function exportMd() {
   border-radius: 4px;
 }
 .content {
-  line-height: 1.55;
+  line-height: 1.5;
   color: #1f2937;
   white-space: pre-wrap;
 }
 .content :deep(pre) {
   background: #1e1e1e;
   color: #d4d4d4;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
   overflow-x: auto;
+  margin: 4px 0 6px;
 }
 .content :deep(code) {
   font-family: 'Fira Code', monospace;
-  font-size: 13px;
+  font-size: 12.5px;
 }
 .actions {
   display: flex;
@@ -133,22 +134,26 @@ function exportMd() {
   opacity: 1;
 }
 .section {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .section h4 {
-  margin: 0 0 4px 0;
+  margin: 0 0 2px 0;
   color: #111827;
   font-size: 15px;
+  font-weight: 600;
 }
 .section :deep(p) {
-  margin: 4px 0;
+  margin: 2px 0;
 }
 .section :deep(ul) {
-  margin: 4px 0;
+  margin: 2px 0;
   padding-left: 18px;
 }
 .section :deep(li) {
-  margin: 2px 0;
+  margin: 1px 0;
+}
+.section :deep(li > p) {
+  margin: 1px 0;
 }
 .sources {
   margin-top: 6px;
