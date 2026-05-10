@@ -1,0 +1,14 @@
+[
+  {
+    "id": "self-p01",
+    "title": "selfdb.raft.election_timeout",
+    "content": "**推荐值**: 1000ms - 3000ms（默认1500ms）\n**作用**: 控制Raft leader选举超时时间\n**场景**: \n- 同机房部署: 1000ms\n- 跨AZ部署: 2000ms以上，避免网络闪断导致频繁选举\n- 跨地域部署: 3000ms\n**注意**: 所有节点必须保持一致，修改后需滚动重启\n**是否重启**: 是\n**风险**: 设置过小导致频繁选举，过大导致故障恢复慢",
+    "metadata": {"category": "Raft", "restart": true, "scope": "node", "internal": true}
+  },
+  {
+    "id": "self-p02",
+    "title": "selfdb.store.io_threads",
+    "content": "**推荐值**: CPU核数的50%，默认8，高并发场景16-32\n**作用**: 控制底层RocksDB的IO线程数\n**检查方法**: `selfctl metrics | grep store_io_util`，若持续>80%则增加线程\n**是否重启**: 否（支持在线reload）\n**风险**: 过多线程会增加上下文切换开销，建议不超过CPU核数",
+    "metadata": {"category": "性能", "restart": false, "scope": "node", "internal": true}
+  }
+]

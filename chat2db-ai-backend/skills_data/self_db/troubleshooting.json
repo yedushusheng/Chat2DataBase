@@ -1,0 +1,14 @@
+[
+  {
+    "id": "self-001",
+    "title": "自研数据库节点脑裂(split-brain)排查",
+    "content": "【内部机密流程，禁止外泄】\n**现象**: 集群出现多leader或多副本数据不一致\n**排查步骤**: \n1. 登录OCP管理平台 https://ocp.internal/selfdb，进入集群拓扑页\n2. 检查各节点状态灯: 绿色=正常 / 红色=异常 / 黄色=选举中\n3. 查看election.log: `tail -f /data/selfdb/log/election.log | grep 'become leader'`\n4. 确认网络分区: `selfctl cluster network-diagnose`\n5. 查看各节点term号是否一致\n**解决方案**: \n- 若确认split-brain，执行强制合并（需值班经理审批）:\n  `selfctl cluster force-merge --node-id <id> --dry-run` 先演练\n  `selfctl cluster force-merge --node-id <id>` 执行合并\n6. 合并后验证数据一致性: `selfctl checksum verify --scope=all`\n7. 上报SRE工单，记录根因和恢复时间\n**风险**: force-merge会导致短时间不可写，务必在低峰期执行",
+    "metadata": {"severity": "P0", "internal": true, "tags": ["脑裂","一致性","Raft"], "requires_approval": true}
+  },
+  {
+    "id": "self-002",
+    "title": "自研数据库写入抖动(write jitter)排查",
+    "content": "【内部流程】\n**现象**: P99写入延迟周期性 spikes\n**排查步骤**: \n1. 查看自研监控大盘: https://ocp.internal/selfdb/dashboard\n2. 关注核心指标:\n   - `write_latency_p99` > 100ms即异常\n   - `raft_apply_duration` 反映日志回放速度\n   - `store_io_util` 反映底层磁盘IO饱和度\n   - `compaction_pending_bytes` 反映LSM Tree积压\n3. 常见根因:\n   - Raft日志积压: 检查磁盘IO，必要时升级到SSD/NVMe\n   - Region热点: `selfctl hotspot --db=xxx` 查看，执行split/merge\n   - 调度影响: 检查是否有大量Region迁移，临时关闭balance: `selfctl scheduler pause balance`\n   - Compaction阻塞: 调整 `selfdb.rocksdb.max_background_jobs`\n4. 若持续抖动，联系内核组抓取pprof性能火焰图\n**解决方案**: 扩容磁盘IOPS、拆分热点Region、调整compaction线程数、错峰调度",
+    "metadata": {"severity": "P1", "internal": true, "tags": ["抖动","写入","延迟"], "requires_approval": false}
+  }
+]

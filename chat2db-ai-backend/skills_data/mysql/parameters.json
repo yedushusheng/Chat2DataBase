@@ -1,0 +1,20 @@
+[
+  {
+    "id": "mysql-p01",
+    "title": "innodb_buffer_pool_size",
+    "content": "**推荐值**: 物理内存的50%-75%\n**作用**: InnoDB缓存数据和索引，是最重要的性能参数\n**检查命中率**: \n```sql\nSHOW STATUS LIKE 'Innodb_buffer_pool_read%';\n-- 命中率 = 1 - (Innodb_buffer_pool_reads / Innodb_buffer_pool_read_requests)\n```\n**建议**: 生产环境至少设置为内存的60%，不要超过80%以免OOM\n**是否重启**: 是\n**风险**: 设置过大可能导致OS OOM Killer介入",
+    "metadata": {"category": "内存", "restart": true, "scope": "global"}
+  },
+  {
+    "id": "mysql-p02",
+    "title": "max_connections",
+    "content": "**推荐值**: 根据应用连接池规模设定，通常500-2000\n**注意**: 每个连接占用内存（thread_stack + sort_buffer + read_buffer等），过多连接会导致OOM\n**配套调整**: \n- OS层面: `ulimit -n 65535`\n- `/etc/security/limits.conf`: 设置nofile\n- 连接池层面: 合理设置HikariCP/Druid的maxPoolSize\n**是否重启**: 是\n**风险**: 设置过高无实际意义，反而浪费内存",
+    "metadata": {"category": "连接", "restart": true, "scope": "global"}
+  },
+  {
+    "id": "mysql-p03",
+    "title": "innodb_log_file_size",
+    "content": "**推荐值**: 256MB - 2GB（根据写入量，大写入场景建议1GB+）\n**作用**: redo log文件大小，影响崩溃恢复速度和写入吞吐\n**注意**: MySQL 8.0支持在线调整innodb_redo_log_capacity，无需停服\n```sql\nSET GLOBAL innodb_redo_log_capacity = 2147483648; -- 2GB\n```\n**是否重启**: MySQL 8.0否 / 5.7需停服重建ib_logfile\n**风险**: 设置过小导致频繁checkpoint，过大导致恢复慢",
+    "metadata": {"category": "日志", "restart": false, "scope": "global", "version": "8.0"}
+  }
+]

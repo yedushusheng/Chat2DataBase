@@ -1,0 +1,20 @@
+[
+  {
+    "id": "mysql-001",
+    "title": "MySQL连接数打满排查与解决",
+    "content": "**现象**: 应用报Too many connections，无法新建连接\n**排查步骤**: \n1. 查看当前连接数: `SHOW STATUS LIKE 'Threads_connected';` 对比 `SHOW VARIABLES LIKE 'max_connections';`\n2. 查看连接来源: `SHOW PROCESSLIST;` 或查 `performance_schema.threads`\n3. 检查sleep连接: 关注Time列，长时间sleep可能是连接池未回收\n4. 检查活跃连接状态: 是否有大量Locked、Sending data、Waiting for table lock\n5. 查看慢查询: `SHOW GLOBAL STATUS LIKE 'Slow_queries';`\n**解决方案**: \n- 临时扩容: `SET GLOBAL max_connections = 2000;`（需同步调整OS的ulimit）\n- 杀空闲连接: 找到长时间sleep的线程执行 `KILL id;`\n- 长期方案: 优化连接池maxIdleTime、引入ProxySQL中间件、读写分离\n**风险**: 调高max_connections会增加内存消耗，每个连接约256KB-1MB",
+    "metadata": {"severity": "P0", "tags": ["连接数","性能","Too many connections"], "author": "DBA团队"}
+  },
+  {
+    "id": "mysql-002",
+    "title": "MySQL主从复制延迟排查",
+    "content": "**排查步骤**: \n1. 查看延迟: `SHOW SLAVE STATUS\G` 关注 `Seconds_Behind_Master`\n2. 分析延迟原因:\n   - 主库执行了大事务（如批量DELETE/UPDATE）\n   - 从库IO/CPU瓶颈\n   - 从库承担了额外负载（如备份、报表查询）\n   - 主从网络带宽不足或跨机房\n3. 查看从库回放线程: `SHOW PROCESSLIST` 找system user\n4. 查看relay log进度对比master binlog\n**解决方案**: \n- 启用并行复制: `slave_parallel_workers=8`, `slave_parallel_type=LOGICAL_CLOCK`\n- MySQL 8.0使用writeset模式: `transaction_write_set_extraction=XXHASH64`, `binlog_transaction_dependency_tracking=WRITESET`\n- 拆分大事务、升级从库硬件、专线网络",
+    "metadata": {"severity": "P1", "tags": ["主从","复制","延迟"], "author": "DBA团队"}
+  },
+  {
+    "id": "mysql-003",
+    "title": "CPU飙高问题排查",
+    "content": "**排查步骤**: \n1. 定位高CPU线程: `top -H -p $(pidof mysqld)` 找到占用CPU高的THREAD_OS_ID\n2. 映射到SQL: `SELECT * FROM performance_schema.threads WHERE THREAD_OS_ID = xxx;`\n3. 查看当前执行SQL: `performance_schema.events_statements_current`\n4. 获取执行计划: `EXPLAIN FORMAT=JSON SELECT ...`\n**常见根因**: \n- 缺失索引导致全表扫描\n- 大表DDL操作（如ALTER TABLE）\n- 频繁刷脏页: 调整 `innodb_io_capacity` / `innodb_io_capacity_max`\n- 大量并发锁等待导致自旋消耗CPU\n**解决方案**: \n- 加索引、优化SQL、拆分大事务、调整刷脏参数、限流",
+    "metadata": {"severity": "P0", "tags": ["CPU","性能","全表扫描"], "author": "DBA团队"}
+  }
+]

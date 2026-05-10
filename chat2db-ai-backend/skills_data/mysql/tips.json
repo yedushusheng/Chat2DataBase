@@ -1,0 +1,14 @@
+[
+  {
+    "id": "mysql-t01",
+    "title": "快速定位慢查询Top10",
+    "content": "**方法1 - 慢查询日志**: \n```sql\nSET GLOBAL slow_query_log = 'ON';\nSET GLOBAL long_query_time = 1;\nSET GLOBAL log_output = 'FILE,TABLE';\n```\n查看表: `mysql.slow_log`\n\n**方法2 - Performance Schema**: \n```sql\nSELECT DIGEST_TEXT, SCHEMA_NAME, COUNT_STAR, SUM_TIMER_WAIT/1e12 AS total_latency_sec\nFROM performance_schema.events_statements_summary_by_digest\nORDER BY SUM_TIMER_WAIT DESC LIMIT 10;\n```\n\n**方法3 - 命令行工具**: \n```bash\nmysqldumpslow -s t -t 10 /var/lib/mysql/slow.log\npt-query-digest /var/lib/mysql/slow.log > report.txt\n```",
+    "metadata": {"tags": ["慢查询","诊断","performance_schema"], "author": "DBA团队"}
+  },
+  {
+    "id": "mysql-t02",
+    "title": "InnoDB锁问题速查手册",
+    "content": "**查看锁等待链**: \n```sql\nSELECT * FROM information_schema.INNODB_LOCK_WAITS;\nSELECT * FROM information_schema.INNODB_LOCKS;\nSELECT * FROM information_schema.INNODB_TRX;\n```\n\n**MySQL 8.0推荐查询**: \n```sql\nSELECT r.trx_id waiting_trx, r.trx_mysql_thread_id waiting_thread,\n       b.trx_id blocking_trx, b.trx_mysql_thread_id blocking_thread\nFROM performance_schema.data_lock_waits w\nJOIN information_schema.INNODB_TRX b ON b.trx_id = w.BLOCKING_ENGINE_TRANSACTION_ID\nJOIN information_schema.INNODB_TRX r ON r.trx_id = w.REQUESTING_ENGINE_TRANSACTION_ID;\n```\n\n**杀死阻塞事务**: `KILL trx_mysql_thread_id;`",
+    "metadata": {"tags": ["锁","死锁","事务","InnoDB"], "author": "DBA团队"}
+  }
+]

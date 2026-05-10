@@ -1,0 +1,132 @@
+# ==========================================
+# Chat2DB-AI 生产环境配置
+# ==========================================
+
+app:
+  name: "Chat2DB-AI"
+  version: "1.0.0"
+  description: "企业级多数据库智能问答系统"
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: false
+  timeout_keep_alive: 120
+
+databases:
+  - key: "mysql"
+    name: "MySQL"
+    icon: "mysql"
+    is_self: false
+    description: "开源关系型数据库"
+    color: "#4479A1"
+  - key: "oracle"
+    name: "Oracle"
+    icon: "oracle"
+    is_self: false
+    description: "企业级商业数据库"
+    color: "#F80000"
+  - key: "postgresql"
+    name: "PostgreSQL"
+    icon: "postgresql"
+    is_self: false
+    description: "开源对象关系型数据库"
+    color: "#336791"
+  - key: "tidb"
+    name: "TiDB"
+    icon: "tidb"
+    is_self: false
+    description: "分布式NewSQL数据库"
+    color: "#3D3FE0"
+  - key: "oceanbase"
+    name: "OceanBase"
+    icon: "oceanbase"
+    is_self: false
+    description: "国产分布式数据库"
+    color: "#FFB900"
+  - key: "self_db"
+    name: "自研数据库"
+    icon: "self"
+    is_self: true
+    description: "公司自研分布式数据库"
+    color: "#00C853"
+
+rag:
+  chunk_size: 1024
+  chunk_overlap: 256
+  top_k: 8
+  score_threshold: 0.7
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+  chroma_collection: "db_knowledge"
+  persist_directory: "/data/chroma_db"
+  rerank_enabled: true
+
+agents:
+  doubao:
+    name: "豆包"
+    provider: "volcengine"
+    enabled: true
+    timeout: 60
+    max_retries: 2
+    priority: 2
+    max_tokens: 4096
+  wenxin:
+    name: "文心一言"
+    provider: "baidu"
+    enabled: true
+    timeout: 60
+    max_retries: 2
+    priority: 3
+    max_tokens: 4096
+  deepseek:
+    name: "DeepSeek"
+    provider: "deepseek"
+    enabled: true
+    timeout: 60
+    max_retries: 2
+    priority: 1
+    max_tokens: 4096
+  openai:
+    name: "ChatGPT"
+    provider: "openai"
+    enabled: true
+    timeout: 60
+    max_retries: 2
+    priority: 4
+    max_tokens: 4096
+  claude:
+    name: "Claude"
+    provider: "anthropic"
+    enabled: true
+    timeout: 90
+    max_retries: 2
+    priority: 0
+    max_tokens: 4096
+    self_db_only: true
+
+mcp:
+  max_context_length: 12000
+  system_prompt_template: "system_prompt_v1"
+  user_prompt_template: "user_prompt_v1"
+  intent_recognition: true
+  query_expansion: true
+
+skills:
+  base_dir: "./skills_data"
+  auto_reload: false
+  semantic_match_threshold: 0.4
+
+faq:
+  max_hot_questions: 20
+  cache_ttl: 3600
+
+logging:
+  level: "WARNING"
+  format: "json"
+  access_log: true
+  file:
+    enabled: true
+    path: "/var/log/chat2db-ai"
+    rotation: "1 day"
+    retention: "90 days"
